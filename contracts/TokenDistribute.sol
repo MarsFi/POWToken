@@ -43,7 +43,18 @@ contract TokenDistribute is ReentrancyGuard{
         paramSetter = _paramSetter;
     }
 
+    function addWhiteLists (address[] calldata _users) external onlyParamSetter {
+        for (uint i=0; i<_users.length; i++){
+            address _user = _users[i];
+            _addWhiteList(_user);
+        }
+    }
+
     function addWhiteList (address _user) external onlyParamSetter {
+        _addWhiteList(_user);
+    }
+
+    function _addWhiteList (address _user) internal {
         isWhiteListed[_user] = true;
         emit AddedWhiteList(_user);
     }
