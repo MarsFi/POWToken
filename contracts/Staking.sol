@@ -57,6 +57,19 @@ contract Staking is ReentrancyGuard{
         return amount.div(10**10);
     }
 
+    function stakeWithPermit(uint256 amount, uint deadline, uint8 v, bytes32 r, bytes32 s) external nonReentrant updateIncome(msg.sender) updateReward(msg.sender) {
+        require(amount > 0, "Cannot stake 0");
+        notifyLpStakingUpdateIncome();
+
+        balances[msg.sender] = balances[msg.sender].add(amount);
+        totalSupply = totalSupply.add(amount);
+
+        // permit
+        IPOWERC20(hashRateToken).permit(msg.sender, address(this), amount, deadline, v, r, s);
+        IERC20(hashRateToken).safeTransferFrom(msg.sender, address(this), amount);
+        emit Staked(msg.sender, amount);
+    }
+
     function stake(uint256 amount) external nonReentrant updateIncome(msg.sender) updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         notifyLpStakingUpdateIncome();
